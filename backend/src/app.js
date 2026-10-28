@@ -10,7 +10,7 @@ import orderRouter from "./router/order.router.js";
 const app = express();
 
 app.use(cors({
-    origin: "https://pashmi-fashion.vercel.app/",
+    origin: "https://pashmi-fashion.vercel.app",
     credentials: true,
 }));
 app.use(express.json());
