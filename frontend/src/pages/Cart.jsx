@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import toast from "react-hot-toast";
 
-const API_URL = "http://localhost:8000/api/v1/cart";
+const API_URL = "https://codealpha-pashmi-backend.onrender.com/api/v1/cart";
 
 function Cart() {
   const [cart, setCart] = useState({

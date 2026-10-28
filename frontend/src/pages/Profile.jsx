@@ -13,7 +13,7 @@ import {
   LoaderCircle,
 } from "lucide-react";
 
-const API_URL = "http://localhost:8000/api/v1";
+const API_URL = "https://codealpha-pashmi-backend.onrender.com/api/v1";
 
 function Profile() {
   const navigate = useNavigate();

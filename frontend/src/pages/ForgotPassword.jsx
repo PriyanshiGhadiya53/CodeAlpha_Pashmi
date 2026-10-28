@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import AuthLayout from "../components/AuthLayout.jsx";
 import toast from "react-hot-toast";
 
-const API_URL = "http://localhost:8000/api/v1/user";
+const API_URL = "https://codealpha-pashmi-backend.onrender.com/api/v1/user";
 
 function ForgotPassword() {
 

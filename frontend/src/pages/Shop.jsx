@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Search, ShoppingBag } from "lucide-react";
 
-const API_URL = "http://localhost:8000/api/v1/product";
+const API_URL = "https://codealpha-pashmi-backend.onrender.com/api/v1/product";
 
 function Shop() {
   const [products, setProducts] = useState([]);

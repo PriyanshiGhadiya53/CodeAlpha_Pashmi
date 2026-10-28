@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { ShoppingBag, ArrowLeft, Minus, Plus } from "lucide-react";
 import toast from "react-hot-toast";
 
-const API_URL = "http://localhost:8000/api/v1/product";
+const API_URL = "https://codealpha-pashmi-backend.onrender.com/api/v1/product";
 
 export default function ProductDetails() {
     const { id } = useParams();

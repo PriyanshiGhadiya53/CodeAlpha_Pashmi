@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-const API_URL = "http://localhost:8000/api/v1";
+const API_URL = "https://codealpha-pashmi-backend.onrender.com/api/v1";
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);

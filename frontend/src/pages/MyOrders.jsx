@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Package, ShoppingBag } from "lucide-react";
 
-const API_URL = "http://localhost:8000/api/v1";
+const API_URL = "https://codealpha-pashmi-backend.onrender.com/api/v1";
 
 function MyOrders() {
   const [orders, setOrders] = useState([]);

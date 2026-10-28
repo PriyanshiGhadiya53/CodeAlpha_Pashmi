@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import AuthLayout from "../components/AuthLayout.jsx";
 
-const API_URL = "http://localhost:8000/api/v1/user";
+const API_URL = "https://codealpha-pashmi-backend.onrender.com/api/v1/user";
 
 export default function Register() {
   const navigate = useNavigate();

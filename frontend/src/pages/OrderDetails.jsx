@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { ArrowLeft, Package, MapPin } from "lucide-react";
 
-const API_URL = "http://localhost:8000/api/v1";
+const API_URL = "https://codealpha-pashmi-backend.onrender.com/api/v1";
 
 function OrderDetails() {
   const { orderId } = useParams();
