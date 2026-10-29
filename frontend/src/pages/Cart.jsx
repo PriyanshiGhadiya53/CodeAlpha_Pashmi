@@ -30,12 +30,12 @@ function Cart() {
       }
 
       if (!response.ok || result.success === false) {
-        throw new Error(result.message || "Unable to load cart");
+       toast("Please login to view your cart.");
       }
 
       setCart(result.data);
     } catch (error) {
-      toast.error(error.message || "Could not load your cart.");
+      toast("Please login to view your cart.");
     } finally {
       setLoading(false);
     }
