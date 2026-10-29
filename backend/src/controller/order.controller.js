@@ -53,6 +53,7 @@ const placeOrder = asyncHandler(async (req, res) => {
 
       // 3. Check products and stock
       for (const item of cart.items) {
+        const productId = item.product?._id || item.product;
         const product = await Product.findById(productId).session(session);
 
         if (!product) {
