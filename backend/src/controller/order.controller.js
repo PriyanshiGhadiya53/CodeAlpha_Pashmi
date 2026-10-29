@@ -7,127 +7,132 @@ import { apiResponse } from "../util/apiResponse.js";
 import { asyncHandler } from "../util/asyncHandler.js";
 
 const placeOrder = asyncHandler(async (req, res) => {
-    const userId = req.user._id;
-    const { deliveryAddress } = req.body;
+  const userId = req.user._id;
+  const { deliveryAddress } = req.body;
 
-    // 1. Validate delivery address
-    const requiredFields = [
-        "fullName",
-        "phone",
-        "address",
-        "city",
-        "state",
+  // 1. Validate delivery address
+  const requiredFields = [
+    "fullName",
+    "phone",
+    "address",
+    "city",
+    "state",
 
-    ];
+  ];
 
-    if (
-        !deliveryAddress ||
-        requiredFields.some(
-            (field) =>
-                typeof deliveryAddress[field] !== "string" ||
-                !deliveryAddress[field].trim()
-        )
-    ) {
-        throw new apiError(400, "Please provide complete delivery address");
-    }
+  if (
+    !deliveryAddress ||
+    requiredFields.some(
+      (field) =>
+        typeof deliveryAddress[field] !== "string" ||
+        !deliveryAddress[field].trim()
+    )
+  ) {
+    throw new apiError(400, "Please provide complete delivery address");
+  }
 
-    if (!/^\d{10}$/.test(deliveryAddress.phone.trim())) {
-        throw new apiError(400, "Please provide a valid 10-digit phone number");
-    }
+  if (!/^\d{10}$/.test(deliveryAddress.phone.trim())) {
+    throw new apiError(400, "Please provide a valid 10-digit phone number");
+  }
 
 
-    const session = await mongoose.startSession();
-    let createdOrder;
+  const session = await mongoose.startSession();
+  let createdOrder;
 
-    try {
-        await session.withTransaction(async () => {
-            // 2. Get logged-in user's cart
-            const cart = await Cart.findOne({ user: userId }).session(session);
+  try {
+    await session.withTransaction(async () => {
+      // 2. Get logged-in user's cart
+      const cart = await Cart.findOne({ user: userId }).session(session);
 
-            if (!cart || cart.items.length === 0) {
-                throw new apiError(400, "Your cart is empty");
-            }
+      if (!cart || cart.items.length === 0) {
+        throw new apiError(400, "Your cart is empty");
+      }
 
-            const orderItems = [];
-            let totalAmount = 0;
+      const orderItems = [];
+      let totalAmount = 0;
 
-            // 3. Check products and stock
-            for (const item of cart.items) {
-                const product = await Product.findById(item.product).session(session);
+      // 3. Check products and stock
+      for (const item of cart.items) {
+        const product = await Product.findById(productId).session(session);
 
-                if (!product) {
-                    throw new apiError(404, "A product in your cart no longer exists");
-                }
+        if (!product) {
+          console.log("Missing product ID:", String(productId));
+          console.log("Cart item:", item);
 
-                if (product.stock < item.qnty) {
-                    throw new apiError(
-                        400,
-                        `Insufficient stock for ${product.name}`
-                    );
-                }
+          throw new apiError(
+            404,
+            `Product not found in database: ${String(productId)}`
+          );
+        }
+        if (product.stock < item.qnty) {
+          throw new apiError(
+            400,
+            `Insufficient stock for ${product.name}`
+          );
+        }
 
-                // 4. Save product details and current price in order
-                orderItems.push({
-                    product: product._id,
-                    name: product.name,
-                    img: product.img?.[0] || "",
-                    price: product.price,
-                    qnty: item.qnty,
-                });
-
-                totalAmount += product.price * item.qnty;
-            }
-
-            // 5. Deduct stock only when enough stock is still available
-            for (const item of cart.items) {
-                const stockUpdate = await Product.updateOne(
-                    {
-                        _id: item.product,
-                        stock: { $gte: item.qnty },
-                    },
-                    {
-                        $inc: { stock: -item.qnty },
-                    },
-                    { session }
-                );
-
-                if (stockUpdate.modifiedCount !== 1) {
-                    throw new apiError(
-                        400,
-                        "Stock changed while placing order. Please try again."
-                    );
-                }
-            }
-
-            // 6. Create order
-            const orders = await Order.create(
-                [
-                    {
-                        user: userId,
-                        items: orderItems,
-                        totalAmount,
-                        deliveryAddress,
-                        orderStatus: "Pending",
-                        paymentMethod: "COD",
-                        paymentStatus: "Pending",
-                    },
-                ],
-                { session }
-            );
-
-            createdOrder = orders[0];
-
-            // 7. Empty cart after successful order creation
-            cart.items = [];
-            await cart.save({ session });
+        // 4. Save product details and current price in order
+        orderItems.push({
+          product: product._id,
+          name: product.name,
+          img: product.img?.[0] || "",
+          price: product.price,
+          qnty: item.qnty,
         });
-    } finally {
-        await session.endSession();
-    }
 
-    return res.status(201).json(
-        new apiResponse(201, "Order placed successfully", createdOrder)
-    );
+        totalAmount += product.price * item.qnty;
+      }
+
+      // 5. Deduct stock only when enough stock is still available
+      for (const item of cart.items) {
+        const stockUpdate = await Product.updateOne(
+          {
+            _id: item.product,
+            stock: { $gte: item.qnty },
+          },
+          {
+            $inc: { stock: -item.qnty },
+          },
+          { session }
+        );
+
+        if (stockUpdate.modifiedCount !== 1) {
+          throw new apiError(
+            400,
+            "Stock changed while placing order. Please try again."
+          );
+        }
+      }
+
+      // 6. Create order
+      const orders = await Order.create(
+        [
+          {
+            user: userId,
+            items: orderItems,
+            totalAmount,
+            deliveryAddress,
+            orderStatus: "Pending",
+            paymentMethod: "COD",
+            paymentStatus: "Pending",
+          },
+        ],
+        { session }
+      );
+
+      createdOrder = orders[0];
+
+      // 7. Empty cart after successful order creation
+      cart.items = [];
+      await cart.save({ session });
+    });
+  } finally {
+    await session.endSession();
+  }
+
+  return res.status(201).json(
+    new apiResponse(201, "Order placed successfully", createdOrder)
+  );
 });
 
 const getMyOrders = asyncHandler(async (req, res) => {
@@ -235,10 +240,10 @@ const cancelOrder = asyncHandler(async (req, res) => {
   }
 });
 
-const updateOrderStatus =asyncHandler(async(req,res)=>{
-    const {orderId}=req.params;
-    const {orderStatus}=req.body;
-     const allowedStatuses = [
+const updateOrderStatus = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+  const { orderStatus } = req.body;
+  const allowedStatuses = [
     "Processing",
     "Shipped",
     "Delivered",
@@ -247,8 +252,8 @@ const updateOrderStatus =asyncHandler(async(req,res)=>{
   if (!allowedStatuses.includes(orderStatus)) {
     throw new apiError(400, "Invalid order status")
   }
-    const order=await Order.findById(orderId)
-    if (!order) {
+  const order = await Order.findById(orderId)
+  if (!order) {
     throw new apiError(404, "Order not found");
   }
   if (
@@ -261,7 +266,7 @@ const updateOrderStatus =asyncHandler(async(req,res)=>{
     );
   }
 
-   order.orderStatus = orderStatus;
+  order.orderStatus = orderStatus;
   await order.save();
 
   return res.status(200).json(
@@ -289,7 +294,8 @@ const getAllOrders = asyncHandler(async (req, res) => {
 
 
 
-export { placeOrder,getMyOrders,getOrderById,cancelOrder,updateOrderStatus,
-        getAllOrders
+export {
+  placeOrder, getMyOrders, getOrderById, cancelOrder, updateOrderStatus,
+  getAllOrders
 
- };
+};
