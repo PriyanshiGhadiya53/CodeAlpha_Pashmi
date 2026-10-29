@@ -216,7 +216,7 @@ export default function Navbar() {
               </Link>
 
               <Link
-                to="/shop"
+                to="/categories"
                 onClick={closeMenu}
                 className="border-b border-[#EFD5D0] py-3 text-sm text-[#3B2431]"
               >
