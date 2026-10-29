@@ -65,7 +65,7 @@ export default function ProductDetails() {
 
     const handleAddToCart = async () => {
         try {
-            const response = await fetch("http://localhost:8000/api/v1/cart", {
+            const response = await fetch("https://codealpha-pashmi-backend.onrender.com/api/v1/cart", {
                 method: "POST",
                 credentials: "include",
                 headers: {
