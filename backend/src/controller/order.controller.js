@@ -86,16 +86,18 @@ const placeOrder = asyncHandler(async (req, res) => {
 
       // 5. Deduct stock only when enough stock is still available
       for (const item of cart.items) {
-        const stockUpdate = await Product.updateOne(
-          {
-            _id: item.product,
+    const productId = item.product?._id || item.product;
+
+    const stockUpdate = await Product.updateOne(
+        {
+            _id: productId,
             stock: { $gte: item.qnty },
-          },
-          {
+        },
+        {
             $inc: { stock: -item.qnty },
-          },
-          { session }
-        );
+        },
+        { session }
+    );
 
         if (stockUpdate.modifiedCount !== 1) {
           throw new apiError(
