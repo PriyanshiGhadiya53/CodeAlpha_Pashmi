@@ -19,6 +19,8 @@ function MyOrders() {
         });
 
         const result = await response.json();
+        console.log("Order API status:", response.status);
+console.log("Order API response:", result);
 
         if (response.status === 401) {
           toast.error("Please login to view your orders.");
