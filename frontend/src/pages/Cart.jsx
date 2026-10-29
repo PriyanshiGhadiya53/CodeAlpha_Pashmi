@@ -25,7 +25,7 @@ function Cart() {
 
       if (response.status === 401) {
         setCart({ items: [], totalItems: 0, totalPrice: 0 });
-        toast.error("Please login to view your cart.");
+        toast("Please login to view your cart.");
         return;
       }
 

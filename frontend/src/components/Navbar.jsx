@@ -101,7 +101,7 @@ export default function Navbar() {
               Shop
             </NavLink>
 
-            <NavLink to="/shop" className={navLinkClass}>
+            <NavLink to="/categories" className={navLinkClass}>
               Categories
             </NavLink>
 
